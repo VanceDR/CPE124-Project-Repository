@@ -23,8 +23,9 @@
     <div class="box">
         <div id="color-indicator" class="color-indicator"></div>
     </div>
-    <div id="last-entered" class="last-entered">Time Updated:</div>
-    <div id="timer" class="last-entered">A minute ago</div>
+
+    <div id="last-entered" class="last-entered">Time Someone Last Entered/Exited:</div>
+    <div id="timer-enter" class="last-entered">A minute ago</div>
     <div class="link-col">
         <button class="test-button" id="increment" onclick="inc()">Increment Counter</button>
         <button class="test-button" id="decrement" onclick="dec()"">Decrement Counter</button>
@@ -36,22 +37,18 @@
         var timeLastUpdated = "A minute ago"
 
         socket.on('connection')
-        socket.on('message', (data, relativeTime) =>{
-            console.log('received data')
-            console.log(timeLastUpdated)
 
+        socket.on('message', (data, relativeTime) =>{
             // console.log(data, relativeTime)
-            if (peopleCount != data) {
-                document.getElementById('counter').innerHTML = Number(data)
+            if (peopleCount != Number(data)) {
                 peopleCount = Number(data)
             }
             if (timeLastUpdated != String(relativeTime)){
-                console.log(timeLastUpdated)
-                document.getElementById('timer').innerHTML = String(relativeTime)
                 timeLastUpdated = String(relativeTime)
             }
             updateCounter()
         })
+    
 
         function inc() {
             peopleCount += 1
@@ -74,7 +71,7 @@
             count.innerHTML = 0; // Sets the text to 0
             // const randomValue = Math.floor((Math.random() * 50) + 1); // Generates a random number
             count.innerHTML = peopleCount;
-            const timeUpdated = document.getElementById('timer')
+            const timeUpdated = document.getElementById('timer-enter')
             timeUpdated.innerHTML = timeLastUpdated
             const crowd_level = document.getElementById('crowd-level');
             const crowd_indicator = document.getElementById('color-indicator');
