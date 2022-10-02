@@ -1,5 +1,4 @@
-var resources = require('./../../resources/model');
-
+var resources = require('./../../resources/model')
 var interval, sensor;
 var model = resources.pi.sensors.pir;
 var pluginName = resources.pi.sensors.pir.name;
@@ -34,9 +33,17 @@ function connectHardware() { //#B
   console.info('Hardware %s sensor started!', pluginName);
 };
 
+
+
 function simulate() { //#E
   interval = setInterval(function () {
-    model.value = !model.value;
+    // var randomNumber = Math.random();
+    // if (randomNumber > 0.5) {
+    //   model.value = false
+    // } else {
+    //   model.value = true
+    // }
+    model.value = !model.value
     showValue();
   }, localParams.frequency);
   console.info('Simulated %s sensor started!', pluginName);
