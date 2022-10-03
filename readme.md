@@ -28,6 +28,11 @@ npm start
 ```
 localhost:8484
 ```
+## Things implemented
+1. Counter
+2. Timer for Last Someone Entered/Exited
+3. Partial Graphs
+
 
 ## Things still needed
 1. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
