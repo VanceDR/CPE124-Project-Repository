@@ -5,6 +5,7 @@ var express = require('express'),
   webapp = require('./routes/webapp'),
   luxon = require('luxon')
 
+const {readFileSync , writeFileSync } = require('fs')
 
 var app = express();
 const DateTime = luxon.DateTime
@@ -32,29 +33,30 @@ const server = app.listen(resources.pi.port, function () {
 
 // WebSocket using Socket.IO
 console.log('WebSocket is Running')
+
 const io = socket(server)
+
 io.on('connection', (socket) => {
     console.log(`A connection is running @ ${socket.id}`)
     var startTime = DateTime.now() // Start Time after Initializing
-    socket.on("entering", (data)=>{
+    socket.on("passing", (data)=>{
         // ---- For Time Last Updated when someone Entered ----
         var endTime = DateTime.now()
         var changeTime = endTime.diff(startTime).toMillis()
         var relativeTime = DateTime.now().minus(changeTime).toRelative()
         startTime = DateTime.now()
         // -- end --
-
+        // logging(data)
         io.emit('message', data, relativeTime) // Emiting using Socket.IO to send data to HTML
     })
-    socket.on("exiting", (data)=>{
-        // ---- For Time Last Updated when someone Exited ----
-        var endTime = DateTime.now()
-        var changeTime = endTime.diff(startTime).toMillis()
-        var relativeTime = DateTime.now().minus(changeTime).toRelative()
-        startTime = DateTime.now()
-        // -- end --
-
-        io.emit('message', data, relativeTime) // Emiting using Socket.IO to send data to HTML
+    socket.on("currentData", (data, time) =>{
+        writeFileSync('./data.json',`{"count":"${data}","time":"${time}", "currentTime":"${DateTime.now().toISO()}"}`)
+    })
+    socket.on("retrieveData", ()=>{
+        var file = readFileSync('./data.json')
+        var lastData = JSON.parse(file)
+        console.log(Number(lastData.count),String(lastData.time))
+        io.emit('message', Number(lastData.count),String(lastData.time))
     })
 })
 
