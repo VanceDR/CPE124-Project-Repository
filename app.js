@@ -35,27 +35,40 @@ const server = app.listen(resources.pi.port, function () {
 console.log('WebSocket is Running')
 
 const io = socket(server)
+var peopleCount = 0
 
 io.on('connection', (socket) => {
     console.log(`A connection is running @ ${socket.id}`)
     var startTime = DateTime.now() // Start Time after Initializing
-    socket.on("passing", (data)=>{
-        // ---- For Time Last Updated when someone Entered ----
-        var endTime = DateTime.now()
-        var changeTime = endTime.diff(startTime).toMillis()
-        var relativeTime = DateTime.now().minus(changeTime).toRelative()
-        startTime = DateTime.now()
-        // -- end --
-        // logging(data)
-        io.emit('message', data, relativeTime) // Emiting using Socket.IO to send data to HTML
+    socket.on("entering", ()=>{
+      // ---- For Time Last Updated when someone Entered ----
+      var endTime = DateTime.now()
+      var changeTime = endTime.diff(startTime).toMillis()
+      var relativeTime = DateTime.now().minus(changeTime).toRelative()
+      startTime = DateTime.now()
+      peopleCount++
+      // -- end --
+      io.emit('message', peopleCount, relativeTime) // Emiting using Socket.IO to send data to HTML
     })
+    socket.on("exiting", ()=>{
+      // ---- For Time Last Updated when someone Entered ----
+      var endTime = DateTime.now()
+      var changeTime = endTime.diff(startTime).toMillis()
+      var relativeTime = DateTime.now().minus(changeTime).toRelative()
+      startTime = DateTime.now()
+      if (peopleCount > 0) {
+        peopleCount--
+      }
+      // -- end --
+      io.emit('message', peopleCount, relativeTime) // Emiting using Socket.IO to send data to HTML
+  })
     socket.on("currentData", (data, time) =>{
         writeFileSync('./data.json',`{"count":"${data}","time":"${time}", "currentTime":"${DateTime.now().toISO()}"}`)
     })
     socket.on("retrieveData", ()=>{
         var file = readFileSync('./data.json')
         var lastData = JSON.parse(file)
-        console.log(Number(lastData.count),String(lastData.time))
+        peopleCount = Number(lastData.count)
         io.emit('message', Number(lastData.count),String(lastData.time))
     })
 })

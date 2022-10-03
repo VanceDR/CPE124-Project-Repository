@@ -12,8 +12,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <body>
     <div class="title-1">Building/Room Crowd Counter</div>
+    <div class="link-col">
+        <div class="link-item" ><a href="/test.html">Home Page</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html" onclick="passDataToJS()">See People Count per Hour</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html" onclick="passDataToJS()">See Peak People Count per Hour</a></div>
+    </div>
     <div class="sub-title-1">Number of People Currently in the Building/Room</div>
-    <div id="counter" class="counter">17</div>
+    <div id="counter" class="counter">0</div>
     <div id="crowd-level" class="crowd-level">Normal</div>
     <div class="box">
         <div id="color-indicator" class="color-indicator"></div>
@@ -41,29 +46,19 @@
         })
 
         function passDataToJS() {
-            console.log('saving data to app.js')
             socket.emit('currentData', peopleCount, timeLastUpdated)
         }
 
         function retrieveDataFromJS() {
-            console.log('trying to retrieve data')
             socket.emit('retrieveData')
         }
     
         function inc() {
-            peopleCount += 1
-            // console.log(peopleCount)
-            socket.emit('passing', peopleCount)
-
+            socket.emit('entering')
         }
 
         function dec() {
-            if (peopleCount > 0) {
-                peopleCount -= 1
-            }
-            // console.log(peopleCount)
-            socket.emit('passing', peopleCount)
-
+            socket.emit('exiting')
         }
 
         function updateCounter() {
