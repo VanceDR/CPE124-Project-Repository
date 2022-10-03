@@ -27,16 +27,10 @@
     </div>
     <div class="sub-title-1">People Count per Hour</div>
     <center>
-        <canvas id="chartPerHour" width="1280" height="720"></canvas>
+        <canvas id="chartPerHour" style="max-width: 1280px; max-height: 720px;"></canvas>
     </center>
     <script>
         var chartPerHour = document.getElementById('chartPerHour').getContext('2d');
-
-        const gradientLine = chartPerHour.createLinearGradient(0,0,0,720)
-        gradientLine.addColorStop(0, 'red')
-        gradientLine.addColorStop(0.7, 'yellow')
-        gradientLine.addColorStop(1, 'green')
-
         var data = {
                 labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
                 datasets: [{
@@ -58,14 +52,14 @@
                         17,
                         35,
                     ],
-                    borderColor: gradientLine
+                    borderColor: 'rgba(0,255,255,127)'
                 }]
             }
         let lineChart = new Chart(chartPerHour, {
             type: 'line',
             data: data,
             options: {
-                responsive: false,
+                responsive: true,
                 scale: {
                     y: {
                         min: 0,

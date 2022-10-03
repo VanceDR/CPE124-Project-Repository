@@ -24,17 +24,12 @@
     <div class="sub-title-1">Peak People Count per Hour</div>
    
     <center>
-        <canvas id="peakpplChart" width="1280" height="720"></canvas>
+        <canvas id="peakpplChart" style="max-width: 1280px; max-height: 720px;"></canvas>
     </center>
     
     <script>
         var socket = io();
-        let peakpplChart = document.getElementById('peakpplChart').getContext('2d');
-
-        const gradientLine = peakpplChart.createLinearGradient(0,0,0,720)
-        gradientLine.addColorStop(0, 'red')
-        gradientLine.addColorStop(0.7, 'yellow')
-        gradientLine.addColorStop(1, 'green')
+        let peakpplChart = document.getElementById('peakpplChart').getContext('2d')
 
         var data = {
                 labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
@@ -48,19 +43,22 @@
                         50,
                         60,
                         70,
+                        80,
+                        70,
                         60,
                         50,
                         40,
                         30,
-                        20],
-                    backgroundColor: gradientLine
+                        20,
+                        10],
+                    backgroundColor: 'rgba(0,255,255,127)'
                 }]
             }
         let barChart = new Chart(peakpplChart, {
             type:'bar', //types of charts: bar, line, horizontalBar, etc.
             data: data,
             options:{
-                responsive:false,
+                responsive:true,
                 scale: {
                     y: {
                         min: 0,
