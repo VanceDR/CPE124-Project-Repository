@@ -5,7 +5,10 @@ A WoT Project for Raspberry Pi
 Members:
 
 Del Rosario, Vance
+
 Reyes, Justin Rupert F.
+
+Rudico, Ericka F. 
 
 ## Pre-req
 1. Node installed
