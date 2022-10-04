@@ -1,13 +1,15 @@
 // Initial version
-var express = require('express'),
+var express = require("express"),
   router = express.Router(), //#A
-  resources = require('./../resources/model');
+  resources = require("./../resources/model");
 
-router.route('/').get(function (req, res, next) { //#B
-  res.send(resources.pi.sensors);  //#C
+router.route("/").get(function (req, res, next) {
+  //#B
+  res.send(resources.pi.sensors); //#C
 });
 
-router.route('/pir').get(function (req, res, next) { //#D
+router.route("/pir").get(function (req, res, next) {
+  //#D
   res.send(resources.pi.sensors.pir);
 });
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,12 +11,15 @@
     </style>
 </head>
 <script src="/socket.io/socket.io.js"></script>
+
 <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
-        <div class="link-item" ><a href="/homepage.html">Home Page</a></div>
-        <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html" onclick="passDataToJS()">See People Count per Hour</a></div>
-        <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html" onclick="passDataToJS()">See Peak People Count per Hour</a></div>
+        <div class="link-item"><a href="/homepage.html">Home Page</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html" onclick="passDataToJS()">See People
+                Count per Hour</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html" onclick="passDataToJS()">See Peak
+                People Count per Hour</a></div>
     </div>
     <div class="sub-title-1">Number of People Currently in the Building/Room</div>
     <div id="counter" class="counter">0</div>
@@ -33,17 +37,17 @@
 
     <script>
         var socket = io()
-        socket.on('message', (data, relativeTime) =>{
+        socket.on('message', (data, relativeTime) => {
             // console.log(data, relativeTime)
             if (peopleCount != Number(data)) {
                 peopleCount = Number(data)
             }
-            if (timeLastUpdated != String(relativeTime)){
+            if (timeLastUpdated != String(relativeTime)) {
                 timeLastUpdated = String(relativeTime)
             }
             updateCounter()
         })
-        socket.on('hourly', ()=>{
+        socket.on('hourly', () => {
             retrieveDataFromJS()
             socket.emit('send-hourly', peopleCount)
         })
@@ -56,7 +60,7 @@
         function retrieveDataFromJS() {
             socket.emit('retrieveData')
         }
-    
+
         function inc() {
             socket.emit('entering')
         }
@@ -74,10 +78,10 @@
             timeUpdated.innerHTML = timeLastUpdated
             const crowd_level = document.getElementById('crowd-level');
             const crowd_indicator = document.getElementById('color-indicator');
-            if (peopleCount > 30){
-                crowd_level.innerHTML = "Heavily Crowded";
-                crowd_indicator.style.backgroundColor = 'red';
-            } else if (30 >= peopleCount && peopleCount > 15) {
+            if (peopleCount > 30) {
+                crowd_level.innerHTML = " Heavily Crowded"; crowd_indicator.style.backgroundColor = 'red';
+            } else if
+                (30 >= peopleCount && peopleCount > 15) {
                 crowd_level.innerHTML = "Crowded";
                 crowd_indicator.style.backgroundColor = 'yellow';
             } else {

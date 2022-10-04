@@ -1,94 +1,120 @@
 // Importing
-var express = require('express'),
-  sensorRoutes = require('./routes/sensors'),
-  resources = require('./resources/model'),
-  webapp = require('./routes/webapp'),
-  luxon = require('luxon')
+var express = require("express"),
+  sensorRoutes = require("./routes/sensors"),
+  resources = require("./resources/model"),
+  webapp = require("./routes/webapp"),
+  luxon = require("luxon"),
+  socket = require("socket.io");
 
-const {readFileSync , writeFileSync } = require('fs')
+const { readFileSync, writeFileSync } = require("fs"); // For File Writing and Reading
 
+// Initialize Express
 var app = express();
-const DateTime = luxon.DateTime
+// Initialize Luxon for time
+const DateTime = luxon.DateTime;
 
+// Use the created routes
+app.use("/pi/sensors", sensorRoutes);
+app.use("/", webapp);
 
-app.use('/pi/sensors', sensorRoutes);
-app.use('/', webapp)
-
-app.get('/pi', function (req, res) {
-  res.send('This is the WoT-Pi!')
+// Route to /pi
+app.get("/pi", function (req, res) {
+  res.send("This is the WoT-Pi!");
 });
 
 // --- CODES from the BOOK for the PIR Sensor ---
 // var pirPlugin = require('./plugins/internal/pirPlugin') //#A
 // pirPlugin.start({'simulate': true, 'frequency': 5000}); //#B
 
-const socket = require('socket.io');
-
 // Initializing Server
 const server = app.listen(resources.pi.port, function () {
-    console.log('HTTP server started...');
-    console.info('Your WoT Pi is up and running on port http://localhost:%s', resources.pi.port);
-    
+  console.log("HTTP server started...");
+  console.info(
+    "Your WoT Pi is up and running on port http://localhost:%s",
+    resources.pi.port
+  );
 });
 
 // WebSocket using Socket.IO
-console.log('WebSocket is Running')
+console.log("WebSocket is Running");
 
-const io = socket(server)
-var peopleCount = 0
-io.on('connection', (socket) => {
-    console.log(`A connection is running @ ${socket.id}`)
-    
-    var startTime = DateTime.now() // Start Time after Initializing
-    socket.on("entering", ()=>{
-      // ---- For Time Last Updated when someone Entered ----
-      var endTime = DateTime.now()
-      var changeTime = endTime.diff(startTime).toMillis()
-      var relativeTime = DateTime.now().minus(changeTime).toRelative()
-      startTime = DateTime.now()
-      peopleCount++
-      // -- end --
-      io.emit('message', peopleCount, relativeTime) // Emiting using Socket.IO to send data to HTML
-    })
-    socket.on("exiting", ()=>{
-      // ---- For Time Last Updated when someone Entered ----
-      var endTime = DateTime.now()
-      var changeTime = endTime.diff(startTime).toMillis()
-      var relativeTime = DateTime.now().minus(changeTime).toRelative()
-      startTime = DateTime.now()
-      if (peopleCount > 0) {
-        peopleCount--
-      }
-      // -- end --
-      io.emit('message', peopleCount, relativeTime) // Emiting using Socket.IO to send data to HTML
-    })
-    socket.on("currentData", (data, time) =>{
-        writeFileSync('./data.json',`{"count":"${data}","time":"${time}", "currentTime":"${DateTime.now().toISO()}"}`)
-    })
-    socket.on("retrieveData", ()=>{
-      var file = readFileSync('./data.json')
-      var lastData = JSON.parse(file)
-      peopleCount = Number(lastData.count)
-      io.emit('message', Number(lastData.count),String(lastData.time))
-    })
-    socket.on("send-hourly", (data)=>{
-      console.log('emitted hourly')
-      socket.broadcast.emit('hourly-message', data, DateTime.now().toISOTime())
-    })
+// Initializing Socket.IO
+const io = socket(server); // Initialize socket at the server
+var peopleCount = 0; // Counter Variable
+io.on("connection", (socket) => { // Listens for connection to the server
+  console.log(`A connection is running @ ${socket.id}`); // Displays connection ID
+  var startTime = DateTime.now(); // Start Time after Initializing
 
-    socket.on('send-change', (data,time)=>{
-      console.log('emitting change')
-      socket.broadcast.emit('change-message', data, DateTime.now().toISOTime())
-    })
-    var hourlyInterval = () =>{setInterval(()=>{
-      socket.broadcast.emit('hourly')
-    }, 10000)}
-    const connectedCount = io.of("/").sockets.size
-    console.log(connectedCount)
-    if (connectedCount == 1){
-      hourlyInterval()
+  // WHEN SOMEONE ENTERS
+  socket.on("entering", () => {
+    // ---- For Time Last Updated when someone Entered ----
+    var endTime = DateTime.now(); // Takes current time
+    var changeTime = endTime.diff(startTime).toMillis(); // Subtracts current time to previous time
+    var relativeTime = DateTime.now().minus(changeTime).toRelative(); // Gets the relative time to previous time, i.e. 4 seconds ago
+    startTime = DateTime.now(); // Resets the current time
+    peopleCount++; // Increment Counter
+    // -- end --
+    io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
+  });
+
+  // WHEN SOMEONE EXITS
+  socket.on("exiting", () => {
+    // ---- For Time Last Updated when someone Entered ----
+    var endTime = DateTime.now(); // Takes current time
+    var changeTime = endTime.diff(startTime).toMillis(); // Subtracts current time to previous time
+    var relativeTime = DateTime.now().minus(changeTime).toRelative(); // Gets the relative time to previous time, i.e. 4 seconds ago
+    startTime = DateTime.now(); // Resets the current time
+    if (peopleCount > 0) { // If count is zero, remain at zero
+      peopleCount--; // Decrements the counter
     }
-})
+    // -- end --
+    io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
+  });
+
+  // SAVES CURRENT SINGLE DATA
+  socket.on("currentData", (data, time) => {
+    writeFileSync( // Writes file
+      "./data.json", // Path
+      `{"count":"${data}","time":"${time}", "currentTime":"${DateTime.now().toISO()}"}` // Json format data
+    );
+  });
+
+  // RETRIEVES SAVED SINGLE DATA
+  socket.on("retrieveData", () => {
+    var file = readFileSync("./data.json"); // Reads file @ path
+    var lastData = JSON.parse(file); // Parses the JSON data
+    peopleCount = Number(lastData.count); // sets the counter with the saved data
+    io.emit("message", Number(lastData.count), String(lastData.time)); // returns the data to HTML via io.emit
+  });
+
+  // SENDS DATA TO GRAPH HOURLY
+  socket.on("send-hourly", (data) => {
+    console.log("emitted hourly"); // Log for emitting hourly
+    socket.broadcast.emit("hourly-message", data, DateTime.now().toISOTime()); // sends data to HTML via socket.broadcast.emit
+  });
+
+  // SENDS CHANGES TO COUNT TO GRAPHS
+  socket.on("send-change", (data, time) => {
+    console.log("emitting change"); // Log for emitting hourly
+    socket.broadcast.emit("change-message", data, DateTime.now().toISOTime()); // sends data to HTML via socket.broadcast.emit
+  });
+
+  // HOURLY INTERVAL, currently set to 10 Seconds i.e. 10000ms
+  var hourlyInterval = () => {
+    setInterval(() => {
+      socket.broadcast.emit("hourly"); // sends hourly message to html
+    }, 10000);
+  };
+
+  // Displays number of instances of socket
+  const connectedCount = io.of("/").sockets.size;
+  console.log(connectedCount);
+
+  // Run hourly interval when atleast one socket is connected
+  if (connectedCount == 1) {
+    hourlyInterval();
+  }
+});
 
 /* SAMPLE CODE FOR INTERFACING WITH PIR SENSOR FROM THE BOOK
 var gpio = require("pi-gpio");
