@@ -1,4 +1,12 @@
 # Crowd Counter with NodeJS
+
+A WoT Project for Raspberry Pi
+
+Members:
+
+Del Rosario, Vance
+Reyes, Justin Rupert F.
+
 ## Pre-req
 1. Node installed
 2. Visual Studio Code
