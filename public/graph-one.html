@@ -14,14 +14,12 @@
     integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
 <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
-        <div class="link-item"><a href="/test.html">Home Page</a></div>
+        <div class="link-item"><a href="/homepage.html">Home Page</a></div>
         <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html">See People Count per Hour</a></div>
         <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html">See Peak People Count per Hour</a></div>
     </div>
@@ -30,28 +28,21 @@
         <canvas id="chartPerHour" style="max-width: 1280px; max-height: 720px;"></canvas>
     </center>
     <script>
+        var socket = io();
+        var timeNow = Date.now()
+        // Hourly Message from Server
+        socket.on('change-message', (singleData, time) =>{
+            // console.log('received `message`')
+            console.log(singleData,time)
+            updateChart([time,singleData])
+        })
         var chartPerHour = document.getElementById('chartPerHour').getContext('2d');
         var data = {
-                labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
                 datasets: [{
                     label: 'CPH',
                     data: [
-                        0,
-                        5,
-                        10,
-                        16,
-                        30,
-                        20,
-                        31,
-                        10,
-                        31,
-                        6,
-                        23,
-                        25,
-                        12,
-                        17,
-                        35,
                     ],
+                    labels:["time", "data"],
                     borderColor: 'rgba(0,255,255,127)'
                 }]
             }
@@ -60,38 +51,58 @@
             data: data,
             options: {
                 responsive: true,
-                scale: {
+                tension: 0.25,
+                scales: {
+                    x: {
+                        type: 'time',
+                        ticks: {
+                            source: 'data',
+                            maxTicksLimit: 25,
+                            maxRotation: 90,
+                            minRotation: 90
+                        }
+                    },
                     y: {
                         min: 0,
-                        max: 100
+                        max: 50
                     }
-                },
-                tension: 0.25
+                }
             },
         })
-        var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+        // var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
 
-        function setLabel(labels){
-            var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
-            var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
-            labels.push(nextLabel)
-            labels.shift()
+        function setLabel(labels, nextLabel){
+            // var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
+            // var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
+            if (labels.length < 50) {
+                labels.push(nextLabel)
+            }
+            else {
+                labels.push(nextLabel)
+                labels.shift()
+            }
         }
-        function setData(data) {
-            data.push(Math.floor(Math.random() * 100) + 1)
-            data.shift()
-            // ADD THE DATA TO BE INSERTED HERE AFTER LOGS
+        function setData(data, singleData) {
+            // data.push(Math.floor(Math.random() * 100) + 1) // For random data
+            if (data.length < 50) {
+                data.push(singleData)
+            }
+            else {
+                data.push(singleData)
+                data.shift()
+            }
+            // ADD DATA HERE EVERY HOUR
         }
 
-        function updateChart() {
-            setData(data.datasets[0].data);
-            setLabel(data.labels);
+        function updateChart(singleData) {
+            setData(data.datasets[0].data, singleData);
+            setLabel(data.labels, singleData[0]);
             lineChart.update();
         }
 
-        setInterval(function() {
-            updateChart()
-        }, 2000);
+        // setInterval(function() {
+        //     updateChart()
+        // }, 2000);
 
     </script>
 </body>

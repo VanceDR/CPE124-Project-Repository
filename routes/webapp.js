@@ -2,7 +2,7 @@ var express = require('express'),
   router = express.Router(),
   path = require('path')
 
-homepage = path.resolve(__dirname, './../public/test.html')
+homepage = path.resolve(__dirname, './../public/homepage.html')
 graph_one = path.resolve(__dirname, './../public/graph-one.html')
 graph_two = path.resolve(__dirname, './../public/graph-two.html')
 styles = path.resolve(__dirname, './../public/app-css.css')
@@ -13,7 +13,7 @@ router.get('/', (req, res, next)=>{
     
 })
 
-router.get('/test.html', (req, res, next)=>{
+router.get('/homepage.html', (req, res, next)=>{
     res.status(200).sendFile(homepage)
     
 })

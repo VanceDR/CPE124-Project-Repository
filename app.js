@@ -36,9 +36,9 @@ console.log('WebSocket is Running')
 
 const io = socket(server)
 var peopleCount = 0
-
 io.on('connection', (socket) => {
     console.log(`A connection is running @ ${socket.id}`)
+    
     var startTime = DateTime.now() // Start Time after Initializing
     socket.on("entering", ()=>{
       // ---- For Time Last Updated when someone Entered ----
@@ -61,16 +61,33 @@ io.on('connection', (socket) => {
       }
       // -- end --
       io.emit('message', peopleCount, relativeTime) // Emiting using Socket.IO to send data to HTML
-  })
+    })
     socket.on("currentData", (data, time) =>{
         writeFileSync('./data.json',`{"count":"${data}","time":"${time}", "currentTime":"${DateTime.now().toISO()}"}`)
     })
     socket.on("retrieveData", ()=>{
-        var file = readFileSync('./data.json')
-        var lastData = JSON.parse(file)
-        peopleCount = Number(lastData.count)
-        io.emit('message', Number(lastData.count),String(lastData.time))
+      var file = readFileSync('./data.json')
+      var lastData = JSON.parse(file)
+      peopleCount = Number(lastData.count)
+      io.emit('message', Number(lastData.count),String(lastData.time))
     })
+    socket.on("send-hourly", (data)=>{
+      console.log('emitted hourly')
+      socket.broadcast.emit('hourly-message', data, DateTime.now().toISOTime())
+    })
+
+    socket.on('send-change', (data,time)=>{
+      console.log('emitting change')
+      socket.broadcast.emit('change-message', data, DateTime.now().toISOTime())
+    })
+    var hourlyInterval = () =>{setInterval(()=>{
+      socket.broadcast.emit('hourly')
+    }, 10000)}
+    const connectedCount = io.of("/").sockets.size
+    console.log(connectedCount)
+    if (connectedCount == 1){
+      hourlyInterval()
+    }
 })
 
 /* SAMPLE CODE FOR INTERFACING WITH PIR SENSOR FROM THE BOOK

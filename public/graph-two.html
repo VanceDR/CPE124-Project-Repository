@@ -11,17 +11,17 @@
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-  
-</script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
 <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
-        <div class="link-item" ><a href="/test.html">Home Page</a></div>
+        <div class="link-item" ><a href="/homepage.html">Home Page</a></div>
         <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html">See People Count per Hour</a></div>
         <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html">See Peak People Count per Hour</a></div>
     </div>
     <div class="sub-title-1">Peak People Count per Hour</div>
+    
    
     <center>
         <canvas id="peakpplChart" style="max-width: 1280px; max-height: 720px;"></canvas>
@@ -29,6 +29,13 @@
     
     <script>
         var socket = io();
+        // Hourly Message from Server
+        socket.on('hourly-message', (singleData, time) =>{
+            // console.log('received `message`')
+            console.log(singleData,time)
+            updateChart(singleData)
+        })
+
         let peakpplChart = document.getElementById('peakpplChart').getContext('2d')
 
         var data = {
@@ -75,21 +82,22 @@
             labels.push(nextLabel)
             labels.shift()
         }
-        function setData(data) {
-            data.push(Math.floor(Math.random() * 100) + 1)
+        function setData(data, singleData) {
+            // data.push(Math.floor(Math.random() * 100) + 1) // For random data
+            data.push(singleData)
             data.shift()
             // ADD DATA HERE EVERY HOUR
         }
 
-        function updateChart() {
-            setData(data.datasets[0].data);
+        function updateChart(singleData) {
+            setData(data.datasets[0].data, Number(singleData));
             setLabel(data.labels);
             barChart.update();
         }
-
-        setInterval(function() {
-            updateChart()
-        }, 2000);
+        // For Set Interval
+        // setInterval(function() {
+        //     updateChart()
+        // }, 2000);
 
     </script>
 </body>
