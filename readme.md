@@ -4,6 +4,8 @@ A WoT Project for Raspberry Pi
 
 Members:
 
+Armocilla, John Mar Y.
+
 Del Rosario, Vance
 
 Reyes, Justin Rupert F.
