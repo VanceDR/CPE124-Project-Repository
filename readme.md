@@ -41,12 +41,20 @@ npm start
 ```
 localhost:8484
 ```
-## Things implemented
+
+
+## Implemented
 1. Counter
 2. Real-Time updated with Socket.io
 3. Charts with Charts.js
 4. Functioning Updates from counter to graphs
 
-## Things still needed
+## To-Do
 1. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
 2. Need Database to collect data over time
+
+
+## Screenshots
+![Main Page](docs/main.png)
+![People Count](docs/PeopleCount.png)
+![Peak People Count](docs/PeakPeopleCount.png)
