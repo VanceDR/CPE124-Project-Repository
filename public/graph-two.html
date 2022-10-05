@@ -30,6 +30,13 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   ></script>
+  <script 
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js" 
+    integrity="sha512-Tfw6etYMUhL4RTki37niav99C6OHwMDB2iBT5S5piyHO+ltK2YX8Hjy9TXxhE1Gm/TmAV0uaykSpnHKFIAif/A==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer">
+  </script>
+
   <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
@@ -90,6 +97,10 @@
               const c = v > 30 ? "red" : v > 15 ? "yellow" : "green";
               return c;
             },
+            borderColor: [
+              'rgba(0, 0, 0, 1)'
+            ],
+            borderWidth: 2
           },
         ],
       };
@@ -135,6 +146,7 @@
             },
           },
         },
+        plugins: [ChartDataLabels]
       });
       var completeLabels = [
         "1AM",
