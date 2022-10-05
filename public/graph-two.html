@@ -37,6 +37,7 @@
         id="peakpplChart"
         style="max-width: 1280px; max-height: 720px"
       ></canvas>
+      <button onclick="resetZoom()">Reset Zoom</button>
     </center>
 
     <script>
@@ -109,7 +110,11 @@
           },
       });
       var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
-
+      
+      function resetZoom() {
+        lineChart.resetZoom();
+      }
+      
       function setLabel(labels){
           var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
           var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
