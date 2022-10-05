@@ -18,6 +18,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js" integrity="sha512-qRj8N7fxOHxPkKjnQ9EJgLJ8Ng1OK7seBn1uk8wkqaXpa7OA13LO6txQ7+ajZonyc9Ts4K/ugXljevkFTUGBcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.js" integrity="sha512-7X7B4dUsqfSxUe5m8NELendyUKx+xwZg4wSFECgBIPGaMSLS6e6oDGkxfJsFOlPADqIwkrP/pI9PihypuWFbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
@@ -92,6 +94,24 @@
               },
             },
           },
+          plugins: {
+            zoom: {
+              pan: {
+                enabled: true,
+                mode: 'xy',
+                threshold: 5,
+              },
+              zoom: {
+                wheel: {
+                  enabled: true
+                },
+                pinch: {
+                  enabled: true
+                },
+                mode: 'xy',
+              }
+            }
+          }
         },
       });
       // var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
