@@ -8,7 +8,7 @@ var express = require("express"),
   Gpio = require('onoff').Gpio;
 
 const { clear } = require("console");
-const { readFileSync, writeFileSync, fstat } = require("fs"); // For File Writing and Reading
+const { readFileSync, writeFileSync, existsSync} = require("fs"); // For File Writing and Reading
 const { exit } = require("process");
 
 // Initialize Express
@@ -142,7 +142,7 @@ io.on("connection", (socket) => { // Listens for connection to the server
 
   // RETRIEVES SAVED SINGLE DATA
   socket.on("retrieveData", () => {
-    if (fs.existsSync("./data.json")){
+    if (existsSync("./data.json")){
       var file = readFileSync("./data.json"); // Reads file @ path
       var lastData = JSON.parse(file); // Parses the JSON data
       peopleCount = Number(lastData.count); // sets the counter with the saved data
@@ -167,7 +167,7 @@ io.on("connection", (socket) => { // Listens for connection to the server
   })
 
   socket.on("getData", () => {
-    if (fs.existsSync("./arrayData.json")) {
+    if (existsSync("./arrayData.json")) {
       var file = readFileSync("./arrayData.json") // Method for reading the JSON file of the Chart Data
       io.emit('retrieveArrayData', JSON.parse(file)) // Sends back the data to HTML
     }
