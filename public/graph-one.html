@@ -1,173 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <style>
-      @import "app-css.css";
-    </style>
-  </head>
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
-    integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  ></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js" integrity="sha512-qRj8N7fxOHxPkKjnQ9EJgLJ8Ng1OK7seBn1uk8wkqaXpa7OA13LO6txQ7+ajZonyc9Ts4K/ugXljevkFTUGBcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.js" integrity="sha512-7X7B4dUsqfSxUe5m8NELendyUKx+xwZg4wSFECgBIPGaMSLS6e6oDGkxfJsFOlPADqIwkrP/pI9PihypuWFbEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <body>
-    <div class="title-1">Building/Room Crowd Counter</div>
-    <div class="link-col">
-      <div class="link-item"><a href="/homepage.html">Home Page</a></div>
-      <div class="link-item" style="padding-left: 20px">
-        <a href="/graph-one.html">See People Count per Hour</a>
-      </div>
-      <div class="link-item" style="padding-left: 20px">
-        <a href="/graph-two.html">See Peak People Count per Hour</a>
-      </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    @import "app-css.css";
+  </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
+  integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"
+  integrity="sha512-qRj8N7fxOHxPkKjnQ9EJgLJ8Ng1OK7seBn1uk8wkqaXpa7OA13LO6txQ7+ajZonyc9Ts4K/ugXljevkFTUGBcw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.1/chartjs-plugin-zoom.js"
+  integrity="sha512-7X7B4dUsqfSxUe5m8NELendyUKx+xwZg4wSFECgBIPGaMSLS6e6oDGkxfJsFOlPADqIwkrP/pI9PihypuWFbEw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<body>
+  <div class="title-1">Building/Room Crowd Counter</div>
+  <div class="link-col">
+    <div class="link-item"><a href="/homepage.html">Home Page</a></div>
+    <div class="link-item" style="padding-left: 20px">
+      <a href="/graph-one.html">See People Count per Hour</a>
     </div>
-    <div class="sub-title-1">People Count per Hour</div>
-    <center>
-      <canvas
-        id="chartPerHour"
-        style="max-width: 1280px; max-height: 720px"
-      ></canvas>
-      <button onclick="resetZoom()">Reset Zoom</button>
-    </center>
-    <script>
-      var socket = io();
-      var timeNow = Date.now();
-      var chartPerHour = document
-        .getElementById("chartPerHour")
-        .getContext("2d");
+    <div class="link-item" style="padding-left: 20px">
+      <a href="/graph-two.html">See Peak People Count per Hour</a>
+    </div>
+  </div>
+  <div class="sub-title-1">People Count per Hour</div>
+  <center>
+    <canvas id="chartPerHour" style="max-width: 1280px; max-height: 720px"></canvas>
+    <button class="test-button" onclick="resetZoom()">Reset Zoom</button>
+  </center>
+  <script>
+    var socket = io();
+    var timeNow = Date.now();
+    var chartPerHour = document
+      .getElementById("chartPerHour")
+      .getContext("2d");
 
-      var data = {
-        datasets: [
-          {
-            label: "CPH",
-            segment: {
-              borderColor: (ctx) => {
-                val = ctx.p0.parsed.y;
-                return val > 30 ? "red" : val > 15 ? "yellow" : "green";
-              },
+    var data = {
+      datasets: [
+        {
+          label: "CPH",
+          segment: {
+            borderColor: (ctx) => {
+              val = ctx.p0.parsed.y;
+              return val > 30 ? "red" : val > 15 ? "yellow" : "green";
             },
           },
-        ],
-      };
-
-      let lineChart = new Chart(chartPerHour, {
-        type: "line",
-        data: data,
-        options: {
-          responsive: true,
-          tension: 0.25,
-          scales: {
-            x: {
-              type: "time",
-              time: {
-                unit: "hour",
-                displayFormats: {
-                  hour: "hh:mm:ss",
-                },
-              },
-              ticks: {
-                source: "data",
-                maxTicksLimit: 25,
-                maxRotation: 90,
-                minRotation: 90,
-                font: {
-                  size: 24,
-                },
-              },
-            },
-            y: {
-              min: 0,
-              max: 50,
-              ticks: {
-                font: {
-                  size: 24,
-                },
-              },
-            },
-          },
-          plugins: {
-            zoom: {
-              pan: {
-                enabled: true,
-                mode: 'xy',
-                threshold: 5,
-              },
-              zoom: {
-                wheel: {
-                  enabled: true
-                },
-                pinch: {
-                  enabled: true
-                },
-                mode: 'xy',
-              }
-            }
-          }
         },
-      });
-      // var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+      ],
+    };
 
-      function resetZoom() {
-        lineChart.resetZoom();
+    let lineChart = new Chart(chartPerHour, {
+      type: "line",
+      data: data,
+      options: {
+        responsive: true,
+        tension: 0.25,
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              displayFormats: {
+                hour: "hh:mm:ss A",
+              },
+            },
+            ticks: {
+              source: "data",
+              maxTicksLimit: 25,
+              maxRotation: 90,
+              minRotation: 90,
+              font: {
+                size: 24,
+              },
+            },
+          },
+          y: {
+            min: 0,
+            max: 50,
+            ticks: {
+              font: {
+                size: 24,
+              },
+            },
+          },
+        },
+        plugins: {
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: "xy",
+              threshold: 5,
+            },
+            zoom: {
+              wheel: {
+                enabled: true,
+              },
+              pinch: {
+                enabled: true,
+              },
+              mode: "xy",
+            },
+          },
+        },
+      },
+    });
+    // var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+
+    function resetZoom() {
+      lineChart.resetZoom();
+    }
+
+    function setLabel(labels, nextLabel) {
+      // var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
+      // var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
+      if (labels.length < 50) {
+        labels.push(nextLabel);
+      } else {
+        labels.push(nextLabel);
+        labels.shift();
       }
+    }
 
-      function setLabel(labels, nextLabel) {
-        // var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
-        // var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
-        if (labels.length < 50) {
-          labels.push(nextLabel);
-        } else {
-          labels.push(nextLabel);
-          labels.shift();
-        }
+    function setData(data, singleData) {
+      var parsedData = JSON.parse(
+        `{"x":"${singleData[0]}", "y":"${singleData[1]}"}`
+      ); // Create JSON Object with data
+      if (data.length < 50) {
+        // data.push(Math.floor(Math.random() * 50) + 1) // For random data
+        data.push(parsedData); // Push JSON data to the data array for the graph
+      } else {
+        // data.push(Math.floor(Math.random() * 50) + 1) // For random data
+        data.push(parsedData); // Push JSON data to the data array for the graph
+        data.shift();
       }
+      saveCurrentData(); // Call save data function
+    }
 
-      function setData(data, singleData) {
-        var parsedData = JSON.parse(
-          `{"x":"${singleData[0]}", "y":"${singleData[1]}"}`
-        ); // Create JSON Object with data
-        if (data.length < 50) {
-          // data.push(Math.floor(Math.random() * 50) + 1) // For random data
-          data.push(parsedData); // Push JSON data to the data array for the graph
-        } else {
-          // data.push(Math.floor(Math.random() * 50) + 1) // For random data
-          data.push(parsedData); // Push JSON data to the data array for the graph
-          data.shift();
-        }
-        saveCurrentData(); // Call save data function
-      }
+    // Save data function
+    function saveCurrentData() {
+      socket.emit("arrayData", data.datasets[0].data); // Emit a message with the current data from the graph
+    }
 
-      // Save data function
-      function saveCurrentData() {
-        socket.emit("arrayData", data.datasets[0].data); // Emit a message with the current data from the graph
-      }
+    function updateChart(singleData) {
+      setData(data.datasets[0].data, singleData); // Updates the data with single data from the counter
+      setLabel(data.labels, singleData[0]); // Updates the labels
+      lineChart.update(); // Updates the chart with the data and label
+    }
 
-      function updateChart(singleData) {
-        setData(data.datasets[0].data, singleData); // Updates the data with single data from the counter
-        setLabel(data.labels, singleData[0]); // Updates the labels
-        lineChart.update(); // Updates the chart with the data and label
-      }
+    socket.on("change-message", (singleData, time) => {
+      // console.log('received `message`')
+      updateChart([time, singleData]); // Updates chart with the data from the counter
+    });
 
-      socket.on("change-message", (singleData, time) => {
-        // console.log('received `message`')
-        updateChart([time, singleData]); // Updates chart with the data from the counter
-      });
+    socket.once("retrieveArrayData", (retrievedData) => {
+      data.datasets[0].data = retrievedData; // Gets the current data from the server to use in the graph
+      lineChart.update();
+    });
+    socket.emit("getData"); // Retrieves data from the files if file is present.
+  </script>
+</body>
 
-      socket.once("retrieveArrayData", (retrievedData) => {
-        data.datasets[0].data = retrievedData; // Gets the current data from the server to use in the graph
-        lineChart.update();
-      });
-      socket.emit("getData"); // Retrieves data from the files if file is present.
-    </script>
-  </body>
 </html>
