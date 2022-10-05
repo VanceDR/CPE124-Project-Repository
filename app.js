@@ -8,7 +8,7 @@ var express = require("express"),
   Gpio = require('onoff').Gpio;
 
 const { clear } = require("console");
-const { readFileSync, writeFileSync, existsSync} = require("fs"); // For File Writing and Reading
+const { readFileSync, writeFileSync, existsSync, fstat } = require("fs"); // For File Writing and Reading
 const { exit } = require("process");
 
 // Initialize Express
