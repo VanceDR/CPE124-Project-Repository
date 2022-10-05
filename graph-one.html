@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import "app-css.css";
+    </style>
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
+    integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+<body>
+    <div class="title-1">Building/Room Crowd Counter</div>
+    <div class="link-col">
+        <div class="link-item"><a href="/homepage.html">Home Page</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html">See People Count per Hour</a></div>
+        <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html">See Peak People Count per Hour</a></div>
+    </div>
+    <div class="sub-title-1">People Count per Hour</div>
+    <center>
+        <canvas id="chartPerHour" style="max-width: 1280px; max-height: 720px;"></canvas>
+    </center>
+    <script>
+        var socket = io();
+        var timeNow = Date.now()
+        // Hourly Message from Server
+        socket.on('change-message', (singleData, time) =>{
+            // console.log('received `message`')
+            console.log(singleData,time)
+            updateChart([time,singleData])
+        })
+        var chartPerHour = document.getElementById('chartPerHour').getContext('2d');
+
+        const gradientLine = chartPerHour.createLinearGradient(0,0,0,720)
+
+        var data = {
+            datasets: [{
+                label: 'CPH',
+                data: [
+                ],
+                segment: {
+                    borderColor: ctx => {
+                        val = ctx.p0.parsed.y
+                        return val > 30 ? 'red' : val > 15 ? 'yellow' : 'green'
+                    }
+                }
+            }]
+        }
+        let lineChart = new Chart(chartPerHour, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                tension: 0.25,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit:'hour',
+                            displayFormats: {
+                                hour: 'hh:mm:ss',
+                            }
+                        },
+                        ticks: {
+                            source: 'data',
+                            maxTicksLimit: 25,
+                            maxRotation: 90,
+                            minRotation: 90,
+                            font: {
+                                size: 24,
+                            }
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 50,
+                        ticks: {
+                            font: {
+                                size: 24,
+                            }
+                        }
+                    }
+                }
+            },
+        })
+        // var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+
+        function setLabel(labels, nextLabel){
+            // var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
+            // var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
+            if (labels.length < 200) {
+                labels.push(nextLabel)
+            }
+            else {
+                labels.push(nextLabel)
+                labels.shift()
+            }
+        }
+        function setData(data, singleData) {
+            if (data.length < 200) {
+                // data.push(Math.floor(Math.random() * 50) + 1) // For random data
+                data.push(singleData)
+            }
+            else {
+                // data.push(Math.floor(Math.random() * 50) + 1) // For random data
+                data.push(singleData)
+                data.shift()
+            }
+            // ADD DATA HERE EVERY HOUR
+        }
+
+        function updateChart(singleData) {
+            setData(data.datasets[0].data, singleData);
+            setLabel(data.labels, singleData[0]);
+            lineChart.update();
+        }
+
+        // setInterval(function() {
+        //     updateChart()
+        // }, 2000);
+
+    </script>
+</body>
+
+</html>
