@@ -1,102 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-        @import "app-css.css";
+      @import "app-css.css";
     </style>
-</head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
-<body>
+  </head>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
+    integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+  <body>
     <div class="title-1">Building/Room Crowd Counter</div>
     <div class="link-col">
-        <div class="link-item" ><a href="/homepage.html">Home Page</a></div>
-        <div class="link-item" style="padding-left: 20px"><a href="/graph-one.html">See People Count per Hour</a></div>
-        <div class="link-item" style="padding-left: 20px"><a href="/graph-two.html">See Peak People Count per Hour</a></div>
+      <div class="link-item"><a href="/homepage.html">Home Page</a></div>
+      <div class="link-item" style="padding-left: 20px">
+        <a href="/graph-one.html">See People Count per Hour</a>
+      </div>
+      <div class="link-item" style="padding-left: 20px">
+        <a href="/graph-two.html">See Peak People Count per Hour</a>
+      </div>
     </div>
     <div class="sub-title-1">Peak People Count per Hour</div>
     <center>
-        <canvas id="peakpplChart" style="max-width: 1280px; max-height: 720px;"></canvas>
+      <canvas
+        id="peakpplChart"
+        style="max-width: 1280px; max-height: 720px"
+      ></canvas>
     </center>
-    
+
     <script>
-        var socket = io();
-        // Hourly Message from Server
-        socket.on('hourly-message', (singleData, time) =>{
-            // console.log('received `message`')
-            console.log(singleData,time)
-            updateChart(singleData)
-        })
+      var socket = io();
+      // Hourly Message from Server
+      socket.on('hourly-message', (singleData, time) =>{
+          // console.log('received `message`')
+          console.log(singleData,time)
+          updateChart(singleData)
+      })
 
-        let peakpplChart = document.getElementById('peakpplChart').getContext('2d')
+      let peakpplChart = document.getElementById('peakpplChart').getContext('2d')
 
-        var data = {
-                labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
-                datasets: [{
-                    label: "Peak People Count",
-                    data: [
-                        10,
-                        20,
-                        30,
-                        40,
-                        50,
-                        60,
-                        70,
-                        80,
-                        70,
-                        60,
-                        50,
-                        40,
-                        30,
-                        20,
-                        10],
-                    backgroundColor: 'rgba(0,255,255,127)'
-                }]
-            }
-        let barChart = new Chart(peakpplChart, {
-            type:'bar', //types of charts: bar, line, horizontalBar, etc.
-            data: data,
-            options:{
-                responsive:true,
-                scale: {
-                    y: {
-                        min: 0,
-                        max: 50
-                    }
-                }
-            },
-        });
-        var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+      var data = {
+              labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
+              datasets: [{
+                  label: "Peak People Count",
+                  data: [
+                      10,
+                      20,
+                      30,
+                      40,
+                      50,
+                      50,
+                      50,
+                      50,
+                      50,
+                      50,
+                      50,
+                      40,
+                      30,
+                      20,
+                      10],
+                  backgroundColor: (ctx) => {
+                    const v = ctx.parsed.y;
+                    const c = v > 30 ? 'red' : v > 15 ? 'yellow' : 'green'
+                    return c
+                  }
+            }]
+          }
+      let barChart = new Chart(peakpplChart, {
+          type:'bar', //types of charts: bar, line, horizontalBar, etc.
+          data: data,
+          options:{
+              responsive:true,
+              scale: {
+                  y: {
+                      min: 0,
+                      max: 50
+                  }
+              }
+          },
+      });
+      var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
 
-        function setLabel(labels){
-            var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
-            var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
-            labels.push(nextLabel)
-            labels.shift()
-        }
-        function setData(data, singleData) {
-            // data.push(Math.floor(Math.random() * 100) + 1) // For random data
-            data.push(singleData)
-            data.shift()
-            // ADD DATA HERE EVERY HOUR
-        }
+      function setLabel(labels){
+          var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
+          var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
+          labels.push(nextLabel)
+          labels.shift()
+      }
+      function setData(data, singleData) {
+          // data.push(Math.floor(Math.random() * 100) + 1) // For random data
+          data.push(singleData)
+          data.shift()
+          // ADD DATA HERE EVERY HOUR
+      }
 
-        function updateChart(singleData) {
-            setData(data.datasets[0].data, Number(singleData));
-            setLabel(data.labels);
-            barChart.update();
-        }
-        // For Set Interval
-        // setInterval(function() {
-        //     updateChart()
-        // }, 2000);
-
+      function updateChart(singleData) {
+          setData(data.datasets[0].data, Number(singleData));
+          setLabel(data.labels);
+          barChart.update();
+      }
+      // For Set Interval
+      // setInterval(function() {
+      //     updateChart()
+      // }, 2000);
     </script>
-</body>
+  </body>
 </html>

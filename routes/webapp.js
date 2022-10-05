@@ -27,6 +27,7 @@ router.get("/app-css.css", (req, res, next) => {
   res.status(200).sendFile(styles);
 });
 
+
 router.all("*", (req, res, next) => {
   res.status(404).send("<h1>Page not Found!</h1>");
 });
