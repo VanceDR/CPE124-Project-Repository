@@ -173,6 +173,17 @@ io.on("connection", (socket) => { // Listens for connection to the server
     }
   })
 
+  socket.on("peakData", (data) => {
+    writeFileSync("./peakData.json", JSON.stringify(data))
+  })
+
+  socket.on("hourlyData", () =>{
+    if (existsSync("./peakData.json")) {
+      var file = readFileSync("./peakData.json")
+      io.emit('retrievePeakData', JSON.parse(file))
+    }
+  })
+
 
   // Displays number of instances of socket
   connectedCount = io.of("/").sockets.size;

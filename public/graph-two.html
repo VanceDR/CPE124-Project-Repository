@@ -30,12 +30,12 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   ></script>
-  <script 
-    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js" 
-    integrity="sha512-Tfw6etYMUhL4RTki37niav99C6OHwMDB2iBT5S5piyHO+ltK2YX8Hjy9TXxhE1Gm/TmAV0uaykSpnHKFIAif/A==" 
-    crossorigin="anonymous" 
-    referrerpolicy="no-referrer">
-  </script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.1.0/chartjs-plugin-datalabels.min.js"
+    integrity="sha512-Tfw6etYMUhL4RTki37niav99C6OHwMDB2iBT5S5piyHO+ltK2YX8Hjy9TXxhE1Gm/TmAV0uaykSpnHKFIAif/A=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
 
   <body>
     <div class="title-1">Building/Room Crowd Counter</div>
@@ -60,47 +60,41 @@
     <script>
       var socket = io();
       // Hourly Message from Server
+      function saveCurrentData() {
+        socket.emit("peakData", data.datasets[0].data); // Emit a message with the current data from the graph
+      }
+
       socket.on("hourly-message", (singleData, time) => {
         // console.log('received `message`')
-        console.log(singleData, time);
-        updateChart(singleData);
+        // console.log(singleData, time);
+        updateChart([time, singleData]);
       });
+
+      socket.once("retrievePeakData", (retrievedData) => {
+        data.datasets[0].data = retrievedData; // Gets the current data from the server to use in the graph
+        // console.log(retrievedData);
+        barChart.update();
+      });
+      console.log("retreives hourly data");
+      socket.emit("hourlyData");
 
       let peakpplChart = document
         .getElementById("peakpplChart")
         .getContext("2d");
 
       var data = {
-        labels: [
-          "7AM",
-          "8AM",
-          "9AM",
-          "10AM",
-          "11AM",
-          "12NN",
-          "1PM",
-          "2PM",
-          "3PM",
-          "4PM",
-          "5PM",
-          "6PM",
-          "7PM",
-          "8PM",
-          "9PM",
-        ],
         datasets: [
           {
             label: "Peak People Count",
-            data: [10, 20, 30, 40, 50, 50, 50, 50, 50, 50, 50, 40, 30, 20, 10],
             backgroundColor: (ctx) => {
-              const v = ctx.parsed.y;
-              const c = v > 30 ? "red" : v > 15 ? "yellow" : "green";
-              return c;
+              var v = ctx.parsed;
+              if (v != null) {
+                v = v.y;
+                return v > 30 ? "red" : v > 15 ? "yellow" : "green";
+              }
             },
-            borderColor: [
-              'rgba(0, 0, 0, 1)'
-            ],
-            borderWidth: 2
+            borderColor: ["rgba(0, 0, 0, 1)"],
+            borderWidth: 2,
           },
         ],
       };
@@ -127,18 +121,30 @@
               },
             },
             datalabels: {
-              color: 'rgba(0, 0, 0, 1)',
+              color: "rgba(0, 0, 0, 1)",
               formatter: function (value) {
+                return value.y;
               },
               font: {
-                weight: 'bold',
+                weight: "bold",
                 size: 15,
               },
-            }
+            },
           },
-          scale: {
+          scales: {
             x: {
+              type: "timeseries",
+              time: {
+                // round: true,
+                // unit: 'hour',
+                displayFormats: {
+                  hour: "hh:mm A",
+                },
+              },
               ticks: {
+                source: "data",
+                maxRotation: 90,
+                minRotation: 90,
                 font: {
                   size: 24,
                 },
@@ -157,56 +163,37 @@
         },
         plugins: [ChartDataLabels]
       });
-      var completeLabels = [
-        "1AM",
-        "2AM",
-        "3AM",
-        "4AM",
-        "5AM",
-        "6AM",
-        "7AM",
-        "8AM",
-        "9AM",
-        "10AM",
-        "11AM",
-        "12NN",
-        "1PM",
-        "2PM",
-        "3PM",
-        "4PM",
-        "5PM",
-        "6PM",
-        "7PM",
-        "8PM",
-        "9PM",
-        "10AM",
-        "11AM",
-        "12MN",
-      ];
 
       function resetZoom() {
         barChart.resetZoom();
       }
 
-      function setLabel(labels) {
-        var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1;
-        var nextLabel =
-          completeLabels[labelIndex] != undefined
-            ? completeLabels[labelIndex]
-            : "7AM";
-        labels.push(nextLabel);
-        labels.shift();
+      function setLabel(labels, nextLabel) {
+        if (labels.length < 15) {
+          labels.push(nextLabel);
+        } else {
+          labels.push(nextLabel);
+          labels.shift();
+        }
       }
       function setData(data, singleData) {
         // data.push(Math.floor(Math.random() * 100) + 1) // For random data
-        data.push(singleData);
-        data.shift();
+        var parsedData = JSON.parse(
+          `{"x":"${singleData[0]}", "y":"${singleData[1]}"}`
+        ); // Create JSON Object with data
+        if (data.length < 15) {
+          data.push(parsedData);
+        } else {
+          data.push(parsedData);
+          data.shift();
+        }
+        saveCurrentData();
         // ADD DATA HERE EVERY HOUR
       }
 
       function updateChart(singleData) {
-        setData(data.datasets[0].data, Number(singleData));
-        setLabel(data.labels);
+        setData(data.datasets[0].data, singleData);
+        setLabel(data.labels, singleData[0]);
         barChart.update();
       }
       // For Set Interval
