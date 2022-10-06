@@ -67,6 +67,8 @@ localhost:8484
 1. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
 
 ## Screenshots
-![Main Page](docs/main.png)
-![People Count](docs/PeopleCount.png)
-![Peak People Count](docs/PeakPeopleCount.png)
+![Main Page State 1](docs/ui1.png)
+![Main Page State 2](docs/ui2.png)
+![Main Page State 3](docs/ui3.png)
+![People Count](docs/ui4.png)
+![Peak People Count](docs/ui5.png)
