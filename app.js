@@ -94,7 +94,7 @@ io.on("connection", (socket) => { // Listens for connection to the server
     }
   })
 
-  entrySensor.watch((err,value) => {
+  exitSensor.watch((err,value) => {
     if (err) exit(err); // If error, display error
     if (value == 1){
       socket.emit('exiting')  // If actiavted, emit a entering event
