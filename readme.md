@@ -6,7 +6,7 @@ A WoT Project for Raspberry Pi
 
 Armocilla, John Mar Y.
 
-Del Rosario, Vance
+Del Rosario, Vance I.
 
 Reyes, Justin Rupert F.
 
@@ -71,7 +71,7 @@ localhost:8484
 )
 
 ## Project Schedule
-[OneDrive Link]()
+[OneDrive Link](https://mymailmapuaedu-my.sharepoint.com/:x:/g/personal/videlrosario_mymail_mapua_edu_ph/EUeGRbVvGL9Kq_PMt5Lf6D8Bgrw-H90OozBCuEpummQzMQ?e=cDyXBx)
 
 ## Screenshots
 ![Main Page State 1](docs/ui1.png)
