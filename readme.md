@@ -66,6 +66,13 @@ localhost:8484
 ## To-Do
 1. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
 
+## Project Documentation
+[OneDrive Link](https://mymailmapuaedu-my.sharepoint.com/:w:/g/personal/videlrosario_mymail_mapua_edu_ph/EdGDAzNAJyhJtPPZHuMnM1sBnb4RF5dcNqwkgaTv3eMpMw?e=CTHhUd
+)
+
+## Project Schedule
+[OneDrive Link]()
+
 ## Screenshots
 ![Main Page State 1](docs/ui1.png)
 ![Main Page State 2](docs/ui2.png)
