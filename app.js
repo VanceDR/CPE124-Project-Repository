@@ -9,7 +9,6 @@ var express = require("express"),
 
 const { clear } = require("console");
 const { readFileSync, writeFileSync, existsSync, fstat } = require("fs"); // For File Writing and Reading
-const { exit } = require("process");
 
 // Initialize Express
 var app = express();
@@ -26,8 +25,8 @@ app.get("/pi", function (req, res) {
 });
 
 // Sensors
-// entrySensor = new Gpio(17, 'in', 'both') // For Entry (GPIO17 or pin 11)
-// exitSensor = new Gpio(27, 'in', 'both') // For Exit (GPIO27 or pin 13)
+entrySensor = new Gpio(17, 'in', 'both') // For Entry (GPIO17 or pin 11)
+exitSensor = new Gpio(27, 'in', 'both') // For Exit (GPIO27 or pin 13)
 
 /* PINOUT FOR RASPBERRY PI
     3V3  (1) (2)  5V
@@ -52,13 +51,19 @@ app.get("/pi", function (req, res) {
      GND (39) (40) GPIO21
 */
 
-// exit = (err) =>{
-//   if (err) console.log("An error occurred: " + err);
-//   sensor.unexport();
-//   console.log("Bye, bye!");
-//   process.exit();
-// }
-// process.on("SIGINT", exit);
+exit = (err) =>{
+  if (err) console.log("An error occurred: " + err);
+  entrySensor.unexport();
+  exitSensor.unexport();
+  console.log("Bye, bye!");
+  process.exit();
+}
+
+process.on("SIGINT", exit);
+
+// --- CODES from the BOOK for the PIR Sensor ---
+// var pirPlugin = require('./plugins/internal/pirPlugin') //#A
+// pirPlugin.start({'simulate': true, 'frequency': 5000}); //#B
 
 // Initializing Server
 const server = app.listen(resources.pi.port, function () {
@@ -74,7 +79,7 @@ console.log("WebSocket is Running");
 
 // Initializing Socket.IO
 const io = socket(server); // Initialize socket at the server
-var peopleCount = 0; // Counter Variable
+let peopleCount = 0; // Counter Variable
 var connectedCount = 0;
 
   // HOURLY INTERVAL, currently set to 10 Seconds i.e. 10000ms
@@ -83,54 +88,62 @@ function hourlyInterval(callback) {
   setInterval(callback, 5000)
 }
 
+var startTime = DateTime.now(); // Start Time after Initializing
+
+function getRelativeTime() {
+  var endTime = DateTime.now(); // Takes current time
+  var changeTime = endTime.diff(startTime).toMillis(); // Subtracts current time to previous time
+  var relativeTime = DateTime.now().minus(changeTime).toRelative(); // Gets the relative time to previous time, i.e. 4 seconds ago
+  startTime = DateTime.now(); // Resets the current time
+  return relativeTime
+}
+
+
+const entering = () => {
+  // ---- For Time Last Updated when someone Entered ----
+  const relativeTime = getRelativeTime();
+
+  peopleCount++; // Increment Counter
+  
+  // -- end --
+  io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
+}
+
+const exiting = () => {
+  // ---- For Time Last Updated when someone Entered ----
+  const relativeTime = getRelativeTime();
+  
+  if (peopleCount > 0) { // If count is zero, remain at zero
+    peopleCount--; // Decrements the counter
+  }
+  
+  // -- end --
+  io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
+}
+
+// STARTING THE SENSORS
+entrySensor.watch((err,value) => {
+  if (err) exit(err); // If error, display error
+
+  if (value == 1){ 
+    entering() // If actiavted, emit a entering event
+  } else {
+    console.log('Person Entered') // if person passed, display that a person entered
+  }
+})
+
+exitSensor.watch((err,value) => {
+  if (err) exit(err); // If error, display error
+  
+  if (value == 1){
+    exiting()  // If actiavted, emit a entering event
+  } else {
+    console.log('Person Exited') // if person passed, display that a person entered
+  }
+})
+
 io.on("connection", (socket) => { // Listens for connection to the server
   console.log(`A connection is running @ ${socket.id}`); // Displays connection ID
-  var startTime = DateTime.now(); // Start Time after Initializing
-
-  // STARTING THE SENSORS
-  // entrySensor.watch((err,value) => {
-  //   if (err) exit(err); // If error, display error
-  //   if (value == 1){ 
-  //     socket.emit('entering') // If actiavted, emit a entering event
-  //   } else {
-  //     console.log('Person Entered') // if person passed, display that a person entered
-  //   }
-  // })
-
-  // entrySensor.watch((err,value) => {
-  //   if (err) exit(err); // If error, display error
-  //   if (value == 1){
-  //     socket.emit('exiting')  // If actiavted, emit a entering event
-  //   } else {
-  //     console.log('Person Exited') // if person passed, display that a person entered
-  //   }
-  // })
-
-  // WHEN SOMEONE ENTERS
-  socket.on("entering", () => {
-    // ---- For Time Last Updated when someone Entered ----
-    var endTime = DateTime.now(); // Takes current time
-    var changeTime = endTime.diff(startTime).toMillis(); // Subtracts current time to previous time
-    var relativeTime = DateTime.now().minus(changeTime).toRelative(); // Gets the relative time to previous time, i.e. 4 seconds ago
-    startTime = DateTime.now(); // Resets the current time
-    peopleCount++; // Increment Counter
-    // -- end --
-    io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
-  });
-
-  // WHEN SOMEONE EXITS
-  socket.on("exiting", () => {
-    // ---- For Time Last Updated when someone Entered ----
-    var endTime = DateTime.now(); // Takes current time
-    var changeTime = endTime.diff(startTime).toMillis(); // Subtracts current time to previous time
-    var relativeTime = DateTime.now().minus(changeTime).toRelative(); // Gets the relative time to previous time, i.e. 4 seconds ago
-    startTime = DateTime.now(); // Resets the current time
-    if (peopleCount > 0) { // If count is zero, remain at zero
-      peopleCount--; // Decrements the counter
-    }
-    // -- end --
-    io.emit("message", peopleCount, relativeTime); // Emiting using Socket.IO to send data to HTML
-  });
 
   // SAVES CURRENT SINGLE DATA
   socket.on("currentData", (data, time) => {
