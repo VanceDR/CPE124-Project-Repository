@@ -40,78 +40,105 @@
     <script>
       var socket = io();
       // Hourly Message from Server
-      socket.on('hourly-message', (singleData, time) =>{
-          // console.log('received `message`')
-          console.log(singleData,time)
-          updateChart(singleData)
-      })
+      socket.on("hourly-message", (singleData, time) => {
+        console.log(singleData, time);
+        updateChart(singleData);
+      });
 
-      let peakpplChart = document.getElementById('peakpplChart').getContext('2d')
+      let peakpplChart = document
+        .getElementById("peakpplChart")
+        .getContext("2d");
 
       var data = {
-              labels: ['7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM'],
-              datasets: [{
-                  label: "Peak People Count",
-                  data: [
-                      10,
-                      20,
-                      30,
-                      40,
-                      50,
-                      50,
-                      50,
-                      50,
-                      50,
-                      50,
-                      50,
-                      40,
-                      30,
-                      20,
-                      10],
-                  backgroundColor: (ctx) => {
-                    const v = ctx.parsed.y;
-                    const c = v > 30 ? 'red' : v > 15 ? 'yellow' : 'green'
-                    return c
-                  }
-            }]
-          }
-      let barChart = new Chart(peakpplChart, {
-          type:'bar', //types of charts: bar, line, horizontalBar, etc.
-          data: data,
-          options:{
-              responsive:true,
-              scale: {
-                  y: {
-                      min: 0,
-                      max: 50
-                  }
-              }
+        labels: [
+          "7AM",
+          "8AM",
+          "9AM",
+          "10AM",
+          "11AM",
+          "12NN",
+          "1PM",
+          "2PM",
+          "3PM",
+          "4PM",
+          "5PM",
+          "6PM",
+          "7PM",
+          "8PM",
+          "9PM",
+        ],
+        datasets: [
+          {
+            label: "Peak People Count",
+            data: [10, 20, 30, 40, 50, 50, 50, 50, 50, 50, 50, 40, 30, 20, 10],
+            backgroundColor: (ctx) => {
+              const v = ctx.parsed.y;
+              const c = v > 30 ? "red" : v > 15 ? "yellow" : "green";
+              return c;
+            },
           },
+        ],
+      };
+      let barChart = new Chart(peakpplChart, {
+        type: "bar", //types of charts: bar, line, horizontalBar, etc.
+        data: data,
+        options: {
+          responsive: true,
+          scale: {
+            y: {
+              min: 0,
+              max: 50,
+            },
+          },
+        },
       });
-      var completeLabels = ['1AM', '2AM', '3AM', '4AM', '5AM', '6AM','7AM', '8AM', '9AM', '10AM', '11AM', '12NN', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10AM', '11AM', '12MN']
+      var completeLabels = [
+        "1AM",
+        "2AM",
+        "3AM",
+        "4AM",
+        "5AM",
+        "6AM",
+        "7AM",
+        "8AM",
+        "9AM",
+        "10AM",
+        "11AM",
+        "12NN",
+        "1PM",
+        "2PM",
+        "3PM",
+        "4PM",
+        "5PM",
+        "6PM",
+        "7PM",
+        "8PM",
+        "9PM",
+        "10AM",
+        "11AM",
+        "12MN",
+      ];
 
-      function setLabel(labels){
-          var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1
-          var nextLabel = completeLabels[labelIndex] != undefined ? completeLabels[labelIndex] : '7AM'
-          labels.push(nextLabel)
-          labels.shift()
+      function setLabel(labels) {
+        var labelIndex = completeLabels.indexOf(labels[labels.length - 1]) + 1;
+        var nextLabel =
+          completeLabels[labelIndex] != undefined
+            ? completeLabels[labelIndex]
+            : "7AM";
+        labels.push(nextLabel);
+        labels.shift();
       }
       function setData(data, singleData) {
-          // data.push(Math.floor(Math.random() * 100) + 1) // For random data
-          data.push(singleData)
-          data.shift()
-          // ADD DATA HERE EVERY HOUR
+        data.push(singleData);
+        data.shift();
+        // ADD DATA HERE EVERY HOUR
       }
 
       function updateChart(singleData) {
-          setData(data.datasets[0].data, Number(singleData));
-          setLabel(data.labels);
-          barChart.update();
+        setData(data.datasets[0].data, Number(singleData));
+        setLabel(data.labels);
+        barChart.update();
       }
-      // For Set Interval
-      // setInterval(function() {
-      //     updateChart()
-      // }, 2000);
     </script>
   </body>
 </html>

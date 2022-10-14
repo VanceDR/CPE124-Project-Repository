@@ -65,14 +65,11 @@
       }
 
       socket.on("hourly-message", (singleData, time) => {
-        // console.log('received `message`')
-        // console.log(singleData, time);
         updateChart([time, singleData]);
       });
 
       socket.once("retrievePeakData", (retrievedData) => {
         data.datasets[0].data = retrievedData; // Gets the current data from the server to use in the graph
-        // console.log(retrievedData);
         barChart.update();
       });
       console.log("retreives hourly data");
@@ -135,8 +132,6 @@
             x: {
               type: "timeseries",
               time: {
-                // round: true,
-                // unit: 'hour',
                 displayFormats: {
                   hour: "hh:mm A",
                 },
@@ -161,7 +156,7 @@
             },
           },
         },
-        plugins: [ChartDataLabels]
+        plugins: [ChartDataLabels],
       });
 
       function resetZoom() {
@@ -177,7 +172,6 @@
         }
       }
       function setData(data, singleData) {
-        // data.push(Math.floor(Math.random() * 100) + 1) // For random data
         var parsedData = JSON.parse(
           `{"x":"${singleData[0]}", "y":"${singleData[1]}"}`
         ); // Create JSON Object with data
@@ -196,10 +190,6 @@
         setLabel(data.labels, singleData[0]);
         barChart.update();
       }
-      // For Set Interval
-      // setInterval(function() {
-      //     updateChart()
-      // }, 2000);
     </script>
   </body>
 </html>
