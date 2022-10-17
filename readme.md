@@ -26,8 +26,9 @@ Rudico, Ericka F.
 - Developed the data storage of the application for the charts
 
 ## Pre-req
-1. Node installed
-2. Visual Studio Code
+1. Git installed
+2. Node installed
+3. Visual Studio Code
 
 ## Running the Codes
 0. Open Terminal with 
