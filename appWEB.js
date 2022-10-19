@@ -4,8 +4,8 @@ var express = require("express"),
   resources = require("./resources/model"),
   webapp = require("./routes/webapp"),
   luxon = require("luxon"),
-  socket = require("socket.io"),
-  Gpio = require("onoff").Gpio;
+  socket = require("socket.io");
+  // Gpio = require("onoff").Gpio;
 
 const { readFileSync, writeFileSync, existsSync } = require("fs"); // For File Writing and Reading
 
@@ -24,8 +24,8 @@ app.get("/pi", function (req, res) {
 });
 
 // Sensors
-entrySensor = new Gpio(17, "in", "both"); // For Entry (GPIO17 or pin 11)
-exitSensor = new Gpio(27, "in", "both"); // For Exit (GPIO27 or pin 13)
+// entrySensor = new Gpio(17, "in", "both"); // For Entry (GPIO17 or pin 11)
+// exitSensor = new Gpio(27, "in", "both"); // For Exit (GPIO27 or pin 13)
 
 /* PINOUT FOR RASPBERRY PI
     3V3  (1) (2)  5V
@@ -50,15 +50,15 @@ exitSensor = new Gpio(27, "in", "both"); // For Exit (GPIO27 or pin 13)
      GND (39) (40) GPIO21
 */
 
-exit = (err) => {
-  if (err) console.log("An error occurred: " + err);
-  entrySensor.unexport();
-  exitSensor.unexport();
-  console.log("Bye, bye!");
-  process.exit();
-};
+// exit = (err) => {
+//   if (err) console.log("An error occurred: " + err);
+//   entrySensor.unexport();
+//   exitSensor.unexport();
+//   console.log("Bye, bye!");
+//   process.exit();
+// };
 
-process.on("SIGINT", exit);
+// process.on("SIGINT", exit);
 
 // --- CODES from the BOOK for the PIR Sensor ---
 // var pirPlugin = require('./plugins/internal/pirPlugin') //#A
@@ -121,29 +121,35 @@ const exiting = () => {
 };
 
 // STARTING THE SENSORS
-entrySensor.watch((err, value) => {
-  if (err) exit(err); // If error, display error
+// entrySensor.watch((err, value) => {
+//   if (err) exit(err); // If error, display error
 
-  if (value == 1) {
-    entering(); // If actiavted, emit a entering event
-  } else {
-    console.log("Person Entered"); // if person passed, display that a person entered
-  }
-});
+//   if (value == 1) {
+//     entering(); // If actiavted, emit a entering event
+//   } else {
+//     console.log("Person Entered"); // if person passed, display that a person entered
+//   }
+// });
 
-exitSensor.watch((err, value) => {
-  if (err) exit(err); // If error, display error
+// exitSensor.watch((err, value) => {
+//   if (err) exit(err); // If error, display error
 
-  if (value == 1) {
-    exiting(); // If actiavted, emit a entering event
-  } else {
-    console.log("Person Exited"); // if person passed, display that a person entered
-  }
-});
+//   if (value == 1) {
+//     exiting(); // If actiavted, emit a entering event
+//   } else {
+//     console.log("Person Exited"); // if person passed, display that a person entered
+//   }
+// });
 
 io.on("connection", (socket) => {
   // Listens for connection to the server
   console.log(`A connection is running @ ${socket.id}`); // Displays connection ID
+  socket.on('entering', ()=>{
+    entering();
+  })
+  socket.on('exiting', ()=>{
+    exiting();
+  })
 
   // SAVES CURRENT SINGLE DATA
   socket.on("currentData", (data, time) => {
