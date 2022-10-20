@@ -47,25 +47,33 @@ cd CPE124-Project-Repository
 ```
 npm install
 ```
-4. Run the app using 
+4. Run the app using
+- 4.1 Running with Hardware
 ```
 npm start
 ```
+- 4.2 Running without Hardware, go to package.json, find the scripts and the line:
+```
+...
+"start": "nodemon app.js --ext js"
+...
+```
+Change `app.js` to `appWEB.js`, then run using `npm start`
+
 5. Open the App in browser with
 ```
 localhost:8484
 ```
-
-
 ## Implemented
 1. Counter
 2. Real-Time updated with Socket.io
 3. Charts with Charts.js
 4. Functioning Updates from counter to graphs
 5. Data storage using JSON
+6. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
 
-## To-Do
-1. Integration of the PIR Sensor to Control the increment and decrement of the values in the webapp
+## Service Learning Files
+[OneDrive Link to Service Learning Files](https://mymailmapuaedu-my.sharepoint.com/:f:/g/personal/jmyarmocilla_mymail_mapua_edu_ph/ErZSaNj5p-dFmhkkxzRdtGsBdXiaFzmtkFyqLirtJHdMIQ?e=YSUQgs)
 
 ## Project Documentation
 [OneDrive Link](https://mymailmapuaedu-my.sharepoint.com/:w:/g/personal/videlrosario_mymail_mapua_edu_ph/EdGDAzNAJyhJtPPZHuMnM1sBnb4RF5dcNqwkgaTv3eMpMw?e=CTHhUd
