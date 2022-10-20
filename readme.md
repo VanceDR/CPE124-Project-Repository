@@ -82,9 +82,6 @@ localhost:8484
 ## Project Schedule
 [OneDrive Link](https://mymailmapuaedu-my.sharepoint.com/:x:/g/personal/videlrosario_mymail_mapua_edu_ph/EUeGRbVvGL9Kq_PMt5Lf6D8Bgrw-H90OozBCuEpummQzMQ?e=cDyXBx)
 
-## Service Learning Files
-[OneDrive Link](https://mymailmapuaedu-my.sharepoint.com/:f:/g/personal/jmyarmocilla_mymail_mapua_edu_ph/ErZSaNj5p-dFmhkkxzRdtGsBdXiaFzmtkFyqLirtJHdMIQ?e=DzGLQ2)
-
 ## Screenshots
 ![Main Page State 1](docs/ui1.png)
 ![Main Page State 2](docs/ui2.png)
